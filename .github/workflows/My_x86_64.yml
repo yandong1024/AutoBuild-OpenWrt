@@ -15,7 +15,7 @@ on:
   #  branches: 
   #    - master
   #    paths:
-  #    - '.github/workflows/Build_OP_x86_64.yml'
+  #    - '.github/workflows/My_OP_x86_64.yml'
   #schedule:
   #  - cron: 0 8 * * 5
   
