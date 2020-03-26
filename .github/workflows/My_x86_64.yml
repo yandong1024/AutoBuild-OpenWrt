@@ -76,7 +76,7 @@ jobs:
       working-directory: ./openwrt/package/lean
       run: |
            git clone https://github.com/jerrykuku/lua-maxminddb.git 
-           git clone https://github.com/Leo-Jo/luci-app-koolproxyR.git
+           git clone https://github.com/ycg31/luci-app-koolproxyR.git
            git clone https://github.com/frainzy1477/luci-app-clash.git
            git clone https://github.com/vernesong/OpenClash.git
            git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly
