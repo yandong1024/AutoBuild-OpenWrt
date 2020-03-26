@@ -14,16 +14,18 @@ on:
   #push:
   #  branches: 
   #    - master
-
+  #    paths:
+  #    - '.github/workflows/Build_OP_x86_64.yml'
   #schedule:
   #  - cron: 0 8 * * 5
   
-  #watch:
-  #  types: [started]
+  watch:
+    types: [started]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
     - name: Checkout
@@ -70,12 +72,18 @@ jobs:
         ./scripts/feeds install -a
         ./scripts/feeds install -a
 
-    #- name: Import external feeds
-    #  working-directory: ./openwrt
-    #  run: |
-    #    git clone https://github.com/Lienol/openwrt-package package/lienol
-    #    git clone "your_github_link" package/"your_folder_name"      
-
+    - name: Import external feeds
+      working-directory: ./openwrt/package/lean
+      run: |
+           git clone https://github.com/jerrykuku/lua-maxminddb.git 
+           git clone https://github.com/Leo-Jo/luci-app-koolproxyR.git
+           git clone https://github.com/frainzy1477/luci-app-clash.git
+           git clone https://github.com/vernesong/OpenClash.git
+           git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly
+           git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly-dark
+           git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
+           git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
+           
     - name: Configuration Customization - Build_x86_64
       env:
         CONFIG_FILE: 'x86_64.config'
