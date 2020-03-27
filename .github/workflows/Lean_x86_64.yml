@@ -5,7 +5,7 @@
 # Youtube Channel: https://goo.gl/fvkdwm 
 #=================================================
 
-name: My_x86_64
+name: lean_x86_64
 
 on: 
   release:
@@ -15,7 +15,7 @@ on:
   #  branches: 
   #    - master
   #    paths:
-  #    - '.github/workflows/My_OP_x86_64.yml'
+  #    - '.github/workflows/Lean_x86_64.yml'
   #schedule:
   #  - cron: 0 8 * * 5
   
@@ -86,7 +86,7 @@ jobs:
            
     - name: Configuration Customization - Build_x86_64
       env:
-        CONFIG_FILE: 'my_x86_64.config'
+        CONFIG_FILE: 'lean_x86_64.config'
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x ./customize.sh && ./customize.sh
@@ -108,5 +108,5 @@ jobs:
     - name : Upload artifact
       uses: actions/upload-artifact@master
       with:
-        name: OpenWrt
+        name: OpenWrt_lean
         path: openwrt/bin
