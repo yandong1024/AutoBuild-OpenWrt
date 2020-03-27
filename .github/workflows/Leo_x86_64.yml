@@ -109,7 +109,7 @@ jobs:
            
     - name: Configuration Customization - Build_x86_64
       env:
-        CONFIG_FILE: 'Leo_x86_64'
+        CONFIG_FILE: 'Leo_x86_64.config'
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x ./customize.sh && ./customize.sh
@@ -126,8 +126,27 @@ jobs:
       run: |
         echo -e "$(nproc) thread build."
         make -j$(nproc) V=s
+        
+    - name: Assemble artifact
+      if: steps.compile.outputs.status == 'success'
+      run: |
+          rm -rf ./artifact/
+          mkdir -p ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
+          
+    - name : Upload uefi_firmware
+      uses: actions/upload-artifact@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE_ONLYUEFI == 'true'
+      with:
+        name: OpenWrt_lean_uefi
+        path: ./artifact/ 
+      
     - name : Upload artifact
+      env: 
+        DATE: date +%y%m%d
       uses: actions/upload-artifact@master
       with:
-        name: OpenWrt_leo_`date +%y%m%d`
+        name: OpenWrt_leo_$DATE
         path: openwrt/bin
