@@ -11,11 +11,11 @@ on:
   release:
     types: [published]
 
-  #push:
+  push:
   #  branches: 
   #    - master
-  #    paths:
-  #    - '.github/workflows/Leo_x86_64.yml'
+      paths:
+      - '.github/workflows/Leo_x86_64.yml'
   #schedule:
   #  - cron: 0 8 * * 5
   
@@ -129,5 +129,5 @@ jobs:
     - name : Upload artifact
       uses: actions/upload-artifact@master
       with:
-        name: OpenWrt_leo
+        name: OpenWrt_leo_`date +%y%m%d`
         path: openwrt/bin
