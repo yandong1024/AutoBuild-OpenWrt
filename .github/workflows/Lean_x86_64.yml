@@ -1,8 +1,7 @@
 #=================================================
 # Description: Build OpenWrt using GitHub Actions
 # Lisence: MIT
-# Author: eSirPlayground
-# Youtube Channel: https://goo.gl/fvkdwm 
+# Author: ycg31
 #=================================================
 
 name: Lean_18.06_x64
@@ -11,16 +10,27 @@ on:
   release:
     types: [published]
 
-  #push:
+  push:
   #  branches: 
   #    - master
-  #    paths:
-  #    - '.github/workflows/Lean_x86_64.yml'
+      paths:
+      - '.github/workflows/Lean_x86_64.yml'
   #schedule:
   #  - cron: 0 8 * * 5
   
   watch:
     types: [started]
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
+  CONFIG_FILE: Lean_18.06_x64
+  DIY_SH: customize.sh
+  SSH_ACTIONS: false
+  UPLOAD_IPK: true
+  UPLOAD_FIRMWARE: true
+  UPLOAD_FIRMWARE_ONLYUEFI: true
+  TZ: Asia/Shanghai
 
 jobs:
   build:
@@ -60,9 +70,6 @@ jobs:
         sudo -E apt-get clean
 
     - name: Clone source code
-      env: 
-        REPO_URL: https://github.com/coolsnowwolf/lede
-        REPO_BRANCH: master
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
 
     - name: Update & Install feeds
@@ -85,13 +92,15 @@ jobs:
            git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
            
     - name: Configuration Customization - Build_x86_64
-      env:
-        CONFIG_FILE: 'Lean_18.06_x64'
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x ./customize.sh && ./customize.sh
+        chmod +x ./$DIY_SH && ./$DIY_SH
         cd openwrt && make defconfig
-        
+
+    - name: SSH connection to Actions
+      uses: P3TERX/debugger-action@master
+      if: env.SSH_ACTIONS == 'true' 
+
     - name: Download package
       working-directory: ./openwrt
       run: |
@@ -100,13 +109,39 @@ jobs:
         find dl -size -1024c -exec rm -f {} \;
 
     - name: Build firmware
+      id: compile
       working-directory: ./openwrt
       run: |
         echo -e "$(nproc) thread build."
         make -j$(nproc) V=s
+        echo "::set-output name=status::success"
 
+    - name: Assemble artifact
+      if: steps.compile.outputs.status == 'success'
+      run: |
+          rm -rf ./artifact/
+          mkdir -p ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
+    
     - name : Upload artifact
       uses: actions/upload-artifact@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE_ONLYUEFI == 'true'
       with:
-        name: OpenWrt_lean
-        path: openwrt/bin
+        name: OpenWrt_lean_uefi
+        path: ./artifact/
+
+    - name: Upload firmware
+      uses: actions/upload-artifact@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true'
+      with:
+        name: OpenWrt_lean_firmware
+        path: ./bin/targets/
+          
+    - name: Upload  IPK
+      uses: actions/upload-artifact@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_IPK == 'true'
+      with:
+        name: OpenWrt_lean_IPK
+        path: ./bin/packages/
