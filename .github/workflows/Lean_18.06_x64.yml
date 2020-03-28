@@ -28,8 +28,9 @@ env:
   DIY_SH: customize.sh
   SSH_ACTIONS: false
   UPLOAD_IPK: true
-  UPLOAD_FIRMWARE: true
-  UPLOAD_FIRMWARE_ONLYUEFI: true
+  UPLOAD_FIRMWARE_ALL: true
+  UPLOAD_FIRMWARE_UEFI: true
+  UPLOAD_FIRMWARE_COMBINED: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -109,40 +110,58 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: Build firmware
-      id: compile
-      working-directory: ./openwrt
+    - name: Multi-thread compile
       run: |
-        echo -e "$(nproc) thread build."
-        make -j$(nproc) V=s
-        echo "::set-output name=status::success"
-
-    - name: Assemble artifact
-      if: steps.compile.outputs.status == 'success'
+          cd openwrt
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+          
+    - name: Single-thread compile
+      if: failure()
       run: |
-          rm -rf ./artifact/
-          mkdir -p ./artifact/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
+          cd openwrt
+          make -j1 V=s
+          
+    - name: Assemble combined
+      run: |
+          rm -rf ./combined/
+          mkdir -p ./combined/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./combined/
+          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./combined/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./combined/
+          
+    - name: Assemble uefi    
+      run: |
+          rm -rf ./uefi/
+          mkdir -p ./uefi/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./uefi/  
     
-    - name : Upload artifact
+    - name : Upload uefi
       uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE_ONLYUEFI == 'true'
+      if: env.UPLOAD_FIRMWARE_COMBINED == 'true'
+      with:
+        name: OpenWrt_lean_combined
+        path: ./combined/
+
+    - name : Upload uefi
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_UEFI == 'true'
       with:
         name: OpenWrt_lean_uefi
-        path: ./artifact/
-
+        path: ./uefi/
+   
     - name: Upload firmware
       uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true'
+      if: env.UPLOAD_FIRMWARE_ALL == 'true'
       with:
         name: OpenWrt_lean_firmware
         path: ./openwrt/bin/targets/
           
     - name: Upload  IPK
       uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_IPK == 'true'
+      if: env.UPLOAD_IPK == 'true'
       with:
         name: OpenWrt_lean_IPK
         path: ./openwrt/bin/packages/
