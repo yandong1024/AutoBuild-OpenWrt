@@ -14,7 +14,7 @@ on:
   #  branches: 
   #    - master
       paths:
-      - '.github/workflows/Lean_x86_64.yml'
+      - '.github/workflows/Lean_18.06_x64.yml'
   #schedule:
   #  - cron: 0 8 * * 5
   
