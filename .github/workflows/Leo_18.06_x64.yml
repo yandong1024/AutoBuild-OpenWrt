@@ -95,11 +95,11 @@ jobs:
       working-directory: ./openwrt
       run: |
          rm    -rfv  package/diy/Lienol-package/package/v2ray-plugin
-         rm    -rfv  package/diy/Lienol-package/v2ray
-         rm    -rfv  package/diy/Lienol-package/simple-obfs
-         rm    -rfv  package/diy/Lienol-package/dns2socks
-         rm    -rfv  package/diy/Lienol-package/ipt2socks
-         rm    -rfv  package/diy/Lienol-package/shadowsocksr-libev
+         rm    -rfv  package/diy/Lienol-package/package/v2ray
+         rm    -rfv  package/diy/Lienol-package/package/simple-obfs
+         rm    -rfv  package/diy/Lienol-package/package/dns2socks
+         rm    -rfv  package/diy/Lienol-package/package/ipt2socks
+         rm    -rfv  package/diy/Lienol-package/package/shadowsocksr-libev
          rm    -rfv  package/lean/autocore
          rm    -rfv  package/lean/luci-app-adbyby-plus
          rm    -rfv  package/my/chinadns-ng
