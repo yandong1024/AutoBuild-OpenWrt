@@ -101,15 +101,28 @@ jobs:
           cd openwrt
           make -j1 V=s
     - name: Assemble artifact
+      if: steps.compile.outputs.status == 'success'
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./artifact/
           find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
-          
-    - name: Upload artifact
+    
+    - name : Upload artifact
       uses: actions/upload-artifact@master
       with:
-        name: OpenWrt firmware
+        name: OpenWrt_lean_uefi
         path: ./artifact/
+
+    - name: Upload firmware
+      uses: actions/upload-artifact@master
+      with:
+        name: OpenWrt_lean_firmware
+        path: ./openwrt/bin/targets/
+          
+    - name: Upload  IPK
+      uses: actions/upload-artifact@master
+      with:
+        name: OpenWrt_lean_IPK
+        path: ./openwrt/bin/packages/
