@@ -60,7 +60,6 @@ jobs:
          git clone https://github.com/jerrykuku/lua-maxminddb.git 
          git clone https://github.com/jlyo/tcping.git
          git clone https://github.com/rofl0r/microsocks.git
-         git clone https://github.com/semigodking/redsocks.git
          git clone https://github.com/ycg31/luci-app-koolproxyR.git
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
@@ -68,14 +67,18 @@ jobs:
          git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly-dark
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
-         git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean
          git clone  https://github.com/Leo-Jo/luci-app-vssr
          git clone https://github.com/Leo-Jo-My/my
          rm    -rfv  my/lua-maxminddb
          rm    -rfv  my/openwrt-dnsforwarder
          rm    -rfv  my/openwrt-simple-obfs
          rm    -rfv  my/openwrt-v2ray-plugin
-   
+    
+    - name: Add feeds
+      run: |
+        cd openwrt
+        sed '1a src-git lean https://github.com/coolsnowwolf/packages' feeds.conf.default
+       
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
