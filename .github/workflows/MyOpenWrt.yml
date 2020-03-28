@@ -105,7 +105,7 @@ jobs:
       - name: Generate configuration file
         run: |
           rm -f ./.config*
-          mv ./Leo_18.06_x64.config ./.config
+          mv ./Leo.config ./.config
           make defconfig
       - name: Make download
         run: |
