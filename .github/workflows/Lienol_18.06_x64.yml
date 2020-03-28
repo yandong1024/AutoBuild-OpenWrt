@@ -99,16 +99,29 @@ jobs:
       run: |
           cd openwrt
           make -j1 V=s
-    - name: Assemble artifact
+    - name: Assemble combined
       run: |
-          rm -rf ./artifact/
-          mkdir -p ./artifact/
+          rm -rf ./combined/
+          mkdir -p ./combined/
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
           find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
+          
+    - name: Assemble uefi
+      run: |
+          rm -rf ./uefi/
+          mkdir -p ./uefi/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./artifact/
           find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
           
     - name: Upload artifact
       uses: actions/upload-artifact@master
       with:
-        name: OpenWrt firmware
-        path: ./artifact/
+        name: OpenWrt Lienol_18.06_uefi
+        path: ./uefi/
+    - name: Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: OpenWrt Lienol_18.06_combined
+        path: ./combined/
