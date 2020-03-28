@@ -81,7 +81,12 @@ jobs:
        
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
-
+ 
+    - name: Del feeds
+      run: |
+        rm -rf feeds/lean/rp-pppoe
+        rm -rf feeds/lean/pptpd
+        
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
     
