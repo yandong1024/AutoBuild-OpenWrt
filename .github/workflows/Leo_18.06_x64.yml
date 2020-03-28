@@ -88,7 +88,7 @@ jobs:
          git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo
          git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
          git clone  https://github.com/Leo-Jo/luci-app-vssr
-         git clone  https://github.com/Lienol/openwrt-package  package/Lienol-package
+         git clone  https://github.com/Lienol/openwrt-package  Lienol-package
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
     - name: 删除冲突文件
