@@ -84,8 +84,8 @@ jobs:
  
     - name: Del feeds
       run: |
-        rm -rf feeds/lean/net/rp-pppoe
-        rm -rf feeds/lean/net/pptpd
+        rm -rf ./openwrt/feeds/lean/net/rp-pppoe
+        rm -rf ./openwrt/feeds/lean/net/pptpd
         
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
