@@ -22,6 +22,18 @@ on:
   watch:
     types: [started]
 
+env:
+  REPO_URL: https://github.com/ycg31/openwrt18.06
+  REPO_BRANCH: master
+  CONFIG_FILE: Leo_18.06_x64.config
+  DIY_SH: customize.sh
+  SSH_ACTIONS: false
+  UPLOAD_IPK: true
+  UPLOAD_FIRMWARE_ALL: true
+  UPLOAD_FIRMWARE_UEFI: true
+  UPLOAD_FIRMWARE_COMBINED: true
+  TZ: Asia/Shanghai
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -59,9 +71,6 @@ jobs:
         sudo -E apt-get -y autoremove --purge
         sudo -E apt-get clean
     - name: Clone source code
-      env: 
-        REPO_URL: https://github.com/ycg31/openwrt18.06
-        REPO_BRANCH: master
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
 
     - name: 解压包
@@ -107,9 +116,7 @@ jobs:
         ./scripts/feeds install -a
         ./scripts/feeds install -a
            
-    - name: Configuration Customization - Build_x86_64
-      env:
-        CONFIG_FILE: 'Leo_18.06_x64.config'
+    - name: Configuration Customization
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x ./customize.sh && ./customize.sh
@@ -125,33 +132,54 @@ jobs:
     - name: Multi-thread compile
       working-directory: ./openwrt
       run: |
-          cd openwrt
           echo -e "$(nproc) thread build."
           make -j$(nproc) V=s
     - name: Single-thread compile
       working-directory: ./openwrt
       if: failure()
       run: |
-          cd openwrt
           make -j1 V=s      
-    - name: Assemble artifact
-      if: steps.compile.outputs.status == 'success'
+    
+    - name: Assemble combined
       run: |
-          rm -rf ./artifact/
-          mkdir -p ./artifact/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
+          rm -rf ./combined/
+          mkdir -p ./combined/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./combined/
+          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./combined/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./combined/
           
-    - name : Upload uefi_firmware
+    - name: Assemble uefi    
+      run: |
+          rm -rf ./uefi/
+          mkdir -p ./uefi/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./uefi/  
+    
+    - name : Upload uefi
       uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE_ONLYUEFI == 'true'
+      if: env.UPLOAD_FIRMWARE_COMBINED == 'true'
       with:
-        name: OpenWrt_lean_uefi
-        path: ./artifact/ 
-      
-    - name : Upload artifact
+        name: OpenWrt_leo_combined
+        path: ./combined/
+
+    - name : Upload uefi
       uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_UEFI == 'true'
       with:
-        name: OpenWrt_leo_18.06
-        path: openwrt/bin
+        name: OpenWrt_leo_uefi
+        path: ./uefi/
+   
+    - name: Upload firmware
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_ALL == 'true'
+      with:
+        name: OpenWrt_leo_firmware
+        path: ./openwrt/bin/targets/
+          
+    - name: Upload  IPK
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_IPK == 'true'
+      with:
+        name: OpenWrt_leo_IPK
+        path: ./openwrt/bin/packages/
