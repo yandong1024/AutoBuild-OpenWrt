@@ -76,6 +76,7 @@ jobs:
     - name: Update & Install feeds
       working-directory: ./openwrt
       run: |
+        sed '1a src-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         ./scripts/feeds install -a
@@ -87,7 +88,6 @@ jobs:
            git clone https://github.com/ycg31/luci-app-koolproxyR.git
            git clone https://github.com/frainzy1477/luci-app-clash.git
            git clone https://github.com/vernesong/OpenClash.git
-           git clone https://github.com/awesome-openwrt/luci-app-fileassistant.git
            git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly
            git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly-dark
            git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
