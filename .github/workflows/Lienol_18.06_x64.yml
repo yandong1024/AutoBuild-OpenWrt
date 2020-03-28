@@ -29,8 +29,9 @@ env:
   DIY_SH: customize.sh
   SSH_ACTIONS: false
   UPLOAD_IPK: true
-  UPLOAD_FIRMWARE: true
-  UPLOAD_FIRMWARE_ONLYUEFI: true
+  UPLOAD_FIRMWARE_ALL: true
+  UPLOAD_FIRMWARE_UEFI: true
+  UPLOAD_FIRMWARE_COMBINED: true
   TZ: Asia/Shanghai
   
 jobs:
@@ -103,25 +104,42 @@ jobs:
       run: |
           rm -rf ./combined/
           mkdir -p ./combined/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./combined/
+          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./combined/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./combined/
           
     - name: Assemble uefi
       run: |
           rm -rf ./uefi/
           mkdir -p ./uefi/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./artifact/
-          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./uefi/
           
     - name: Upload artifact
       uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_UEFI == 'true'
       with:
         name: OpenWrt Lienol_18.06_uefi
         path: ./uefi/
     - name: Upload artifact
       uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_COMBINED == 'true'
       with:
         name: OpenWrt Lienol_18.06_combined
         path: ./combined/
+      
+    - name: Upload firmware
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_ALL == 'true'
+      with:
+        name: OpenWrt_Lienol_18.06_firmware
+        path: ./openwrt/bin/targets/
+          
+    - name: Upload  IPK
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_IPK == 'true'
+      with:
+        name: OpenWrt_Lienol_18.06_IPK
+        path: ./openwrt/bin/packages/
+
