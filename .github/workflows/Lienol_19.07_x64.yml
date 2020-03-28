@@ -111,17 +111,17 @@ jobs:
       run: |
           rm -rf ./combined/
           mkdir -p ./combined/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./combined/
-          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./combined/
-          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./combined/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i cp -f {} ./combined/
+          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i cp -f {} ./combined/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./combined/
           
     - name: Assemble uefi
       run: |
           rm -rf ./uefi/
           mkdir -p ./uefi/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./uefi/
-          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./uefi/
-          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i cp -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i cp -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/
           
     - name: Upload artifact
       uses: actions/upload-artifact@master
