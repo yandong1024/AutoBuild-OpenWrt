@@ -121,12 +121,19 @@ jobs:
         make download -j$(nproc)
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-    - name: Build firmware
+        
+    - name: Multi-thread compile
       working-directory: ./openwrt
       run: |
-        echo -e "$(nproc) thread build."
-        make -j$(nproc) V=s
-        
+          cd openwrt
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+    - name: Single-thread compile
+      working-directory: ./openwrt
+      if: failure()
+      run: |
+          cd openwrt
+          make -j1 V=s      
     - name: Assemble artifact
       if: steps.compile.outputs.status == 'success'
       run: |
@@ -144,9 +151,7 @@ jobs:
         path: ./artifact/ 
       
     - name : Upload artifact
-      env: 
-        DATE: date +%y%m%d
       uses: actions/upload-artifact@master
       with:
-        name: OpenWrt_leo_$DATE
+        name: OpenWrt_leo_18.06
         path: openwrt/bin
