@@ -57,9 +57,6 @@ jobs:
       run: |        
          git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
          cd openwrt/package/lean
-         git clone https://github.com/jerrykuku/lua-maxminddb.git 
-         git clone https://github.com/jlyo/tcping.git
-         git clone https://github.com/rofl0r/microsocks.git
          git clone https://github.com/ycg31/luci-app-koolproxyR.git
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
@@ -68,8 +65,7 @@ jobs:
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
          git clone https://github.com/Leo-Jo/luci-app-vssr
-         git clone https://github.com/Leo-Jo-My/my
-         rm    -rfv  my/lua-maxminddb
+         git clone https://github.com/ycg31/my
          rm    -rfv  my/openwrt-dnsforwarder
          rm    -rfv  my/openwrt-simple-obfs
          rm    -rfv  my/openwrt-v2ray-plugin
