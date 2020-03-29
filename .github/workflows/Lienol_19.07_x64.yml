@@ -67,25 +67,25 @@ jobs:
          git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly-dark
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
-         git clone  https://github.com/Leo-Jo/luci-app-vssr
+         git clone https://github.com/Leo-Jo/luci-app-vssr
          git clone https://github.com/Leo-Jo-My/my
          rm    -rfv  my/lua-maxminddb
          rm    -rfv  my/openwrt-dnsforwarder
          rm    -rfv  my/openwrt-simple-obfs
          rm    -rfv  my/openwrt-v2ray-plugin
     
-    - name: Add feeds
-      run: |
-        cd openwrt
-        sed -i '5a src-git lean https://github.com/coolsnowwolf/packages' feeds.conf.default
+#    - name: Add feeds
+#      run: |
+#       cd openwrt
+#        sed -i '5a src-git lean https://github.com/coolsnowwolf/packages' feeds.conf.default
        
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
  
-    - name: Del feeds
-      run: |
-        rm -rf ./openwrt/feeds/lean/net/rp-pppoe
-        rm -rf ./openwrt/feeds/lean/net/pptpd
+#    - name: Del feeds
+#      run: |
+#        rm -rf ./openwrt/feeds/lean/net/rp-pppoe
+#        rm -rf ./openwrt/feeds/lean/net/pptpd
         
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
