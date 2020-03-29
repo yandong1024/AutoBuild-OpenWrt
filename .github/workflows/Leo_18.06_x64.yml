@@ -25,8 +25,8 @@ on:
 env:
   REPO_URL: https://github.com/ycg31/openwrt18.06
   REPO_BRANCH: master
-  CONFIG_FILE: Leo1.config
-  DIY_SH: customize.sh
+  CONFIG_FILE: Leo_18.06_x64.config
+  DIY_SH: 22.sh
   SSH_ACTIONS: false
   UPLOAD_IPK: true
   UPLOAD_FIRMWARE_ALL: true
@@ -118,7 +118,7 @@ jobs:
     - name: Configuration Customization
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x ./customize.sh && ./customize.sh
+        chmod +x ./$DIY_SH && ./$DIY_SH
         cd openwrt && make defconfig
         
     - name: Download package
@@ -143,17 +143,17 @@ jobs:
       run: |
           rm -rf ./combined/
           mkdir -p ./combined/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./combined/
-          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ./combined/
-          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./combined/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i cp -f {} ./combined/
+          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i cp -f {} ./combined/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./combined/
           
     - name: Assemble uefi    
       run: |
           rm -rf ./uefi/
           mkdir -p ./uefi/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./uefi/
-          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i mv -f {} ./uefi/
-          find openwrt/bin/targets/ -name "*config*" | xargs -i mv -f {} ./uefi/  
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i cp -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i cp -f {} ./uefi/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/  
     
     - name : Upload uefi
       uses: actions/upload-artifact@master
