@@ -95,7 +95,13 @@ jobs:
            git clone  https://github.com/Leo-Jo/luci-app-vssr
            git clone  https://github.com/ycg31/my
            
-    - name: Configuration Customization - Build_x86_64
+    - name: 删除冲突插件
+      working-directory: ./openwrt/package/lean/my
+      run: |
+        rm -rvf openwrt-simple-obfs
+        rm -rvf openwrt-v2ray-plugin
+        
+    - name: Configuration Customization 
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x ./$DIY_SH && ./$DIY_SH
