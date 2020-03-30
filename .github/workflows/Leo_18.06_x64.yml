@@ -19,7 +19,7 @@ on:
 env:
   REPO_URL: https://github.com/ycg31/openwrt18.06
   REPO_BRANCH: master
-  CONFIG_FILE: Leo_18.06_x64.config
+  CONFIG_FILE: Leo3.config
   DIY_SH: 222.sh
   SSH_ACTIONS: false
   UPLOAD_IPK: true
@@ -75,23 +75,12 @@ jobs:
          git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo
          git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
          git clone  https://github.com/Leo-Jo/luci-app-vssr
-         git clone  https://github.com/Lienol/openwrt-package  Lienol-package
+         git clone  https://github.com/Sweet-Fairy/openwrt-package
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
     - name: 删除冲突文件
       working-directory: ./openwrt
-      run: |
-         rm    -rfv  package/diy/Lienol-package/package/v2ray-plugin
-         rm    -rfv  package/diy/Lienol-package/package/v2ray
-         rm    -rfv  package/diy/Lienol-package/package/simple-obfs
-         rm    -rfv  package/diy/Lienol-package/package/dns2socks
-         rm    -rfv  package/diy/Lienol-package/package/ipt2socks
-         rm    -rfv  package/diy/Lienol-package/package/shadowsocksr-libev
-         rm    -rfv  package/lean/autocore
-         rm    -rfv  package/lean/luci-app-adbyby-plus
-         rm    -rfv  package/my/chinadns-ng
-         rm    -rfv  package/my/luci-app-passwall
-         rm    -rfv  package/my/tcping   
+      run: |  
          rm    -rfv  package/my/luci-app-openclash 
          rm    -rfv  package/my/luci-app-clash
          
@@ -99,7 +88,6 @@ jobs:
       working-directory: ./openwrt
       run: |
         ./scripts/feeds update -a
-        ./scripts/feeds install -a
         ./scripts/feeds install -a
            
     - name: Configuration Customization
