@@ -155,7 +155,7 @@ jobs:
           find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i cp -f {} ./uefi/
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/  
     
-    - name : Upload uefi
+    - name : Upload combined
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_COMBINED == 'true'
       with:
