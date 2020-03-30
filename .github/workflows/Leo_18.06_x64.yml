@@ -26,6 +26,7 @@ env:
   UPLOAD_FIRMWARE_ALL: true
   UPLOAD_FIRMWARE_UEFI: true
   UPLOAD_FIRMWARE_COMBINED: true
+  UPLOAD_COWTRANSFER: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -157,3 +158,9 @@ jobs:
       with:
         name: OpenWrt_leo_IPK
         path: ./openwrt/bin/packages/
+      
+    - name: Upload firmware to cowtransfer
+      if: env.UPLOAD_COWTRANSFER == 'true'
+      run: |
+        curl -sL https://git.io/cowtransfer | sh
+        ./cowtransfer-uploader -s -p 8 ./openwrt/bin/targets/
