@@ -20,7 +20,7 @@ env:
   REPO_URL: https://github.com/ycg31/openwrt18.06
   REPO_BRANCH: master
   CONFIG_FILE: Leo3.config
-  DIY_SH: 222.sh
+  DIY_SH: leo222.sh
   SSH_ACTIONS: false
   UPLOAD_IPK: true
   UPLOAD_FIRMWARE_ALL: true
