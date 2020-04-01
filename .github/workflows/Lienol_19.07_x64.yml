@@ -64,7 +64,7 @@ jobs:
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
          git clone https://github.com/Leo-Jo/luci-app-vssr
-         git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean
+         git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo luci-app-ssr-plus-lean
          git clone https://github.com/ozon/luci-app-ttyd
          git clone https://github.com/ycg31/my
          rm    -rfv  my/openwrt-dnsforwarder
