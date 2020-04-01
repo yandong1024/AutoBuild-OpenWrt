@@ -61,11 +61,11 @@ jobs:
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
          git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly
-         git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly-dark
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
          git clone https://github.com/Leo-Jo/luci-app-vssr
          git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean
+         git clone https://github.com/ozon/luci-app-ttyd
          git clone https://github.com/ycg31/my
          rm    -rfv  my/openwrt-dnsforwarder
          rm    -rfv  my/openwrt-simple-obfs
@@ -116,7 +116,15 @@ jobs:
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i cp -f {} ./combined/
           find openwrt/bin/targets/ -name "*combined*img*" | xargs -i cp -f {} ./combined/
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./combined/
-          
+     
+    - name: Assemble firmware
+      run: |
+          rm -rf ./firmware/
+          mkdir -p ./firmware/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i cp -f {} ./firmware/
+          find openwrt/bin/targets/ -name "*combined*img*" | xargs -i cp -f {} ./firmware/
+          find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i cp -f {} ./firmware/
+          find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./firmware/         
     - name: Assemble uefi
       run: |
           rm -rf ./uefi/
@@ -151,3 +159,23 @@ jobs:
       with:
         name: OpenWrt_Lienol_19.07_IPK
         path: ./openwrt/bin/packages/
+        
+    - name: Upload firmware to cowtransfer
+      if: env.UPLOAD_COWTRANSFER == 'true'
+      run: |
+        curl -sL https://git.io/cowtransfer | sh
+        ./cowtransfer-uploader -s -p 8 ./firmware/
+    
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: 'firmware.zip'
+        path: ./openwrt/bin/
+        exclusions: './openwrt/bin/targets/x86/64/packeages/*'
+    - name: Upload firmware to cowtransfer
+      if: env.UPLOAD_COWTRANSFER == 'true'
+      run: |
+        mkdir yu
+        cp ./firmware.zip ./yu/firmware.zip
+        curl -sL https://git.io/cowtransfer | sh
+        ./cowtransfer-uploader -s -p 8 ./yu/
