@@ -133,7 +133,10 @@ jobs:
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i cp -f {} ./uefi/
           find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i cp -f {} ./uefi/
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/
-          
+
+    - name: Prepare artifact
+      run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
+    
     - name: Upload artifact
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_UEFI == 'true'
@@ -172,7 +175,7 @@ jobs:
       with:
         filename: 'firmware.zip'
         path: ./openwrt/bin/
-        exclusions: './openwrt/bin/targets/x86/64/packeages/*'
+
     - name: Upload firmware to cowtransfer
       if: env.UPLOAD_COWTRANSFER == 'true'
       run: |
@@ -180,3 +183,14 @@ jobs:
         cp ./firmware.zip ./yu/firmware.zip
         curl -sL https://git.io/cowtransfer | sh
         ./cowtransfer-uploader -s -p 8 ./yu/
+    - name: upload to gitee 传到码云
+      run: |
+        git config --global user.email "ycg31@qq.com"
+        git config --global user.name "ycg31"
+        git clone --depth 1 https://ycg31:${{ secrets.GITEE_TOKEN }}@gitee.com/ycg31/openwrt_firmware.git rom
+        mkdir -p rom/Lienol1907/
+        cp -rf ./bin/* rom/Lienol1907/
+        cd rom
+        git add . || echo "1"
+        git commit -m "github_actions" -a;
+        git push || (sleep 30m && git push) || (sleep 30m && git push)
