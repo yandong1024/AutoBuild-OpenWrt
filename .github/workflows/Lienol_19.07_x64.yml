@@ -189,7 +189,7 @@ jobs:
         git config --global user.name "ycg31"
         git clone --depth 1 https://ycg31:${{ secrets.GITEE_TOKEN }}@gitee.com/ycg31/openwrt_firmware.git rom
         mkdir -p rom/Lienol1907/
-        cp -rf ./bin/* rom/Lienol1907/
+        cp -rf ./openwrt/bin/* rom/Lienol1907/
         cd rom
         git add . || echo "1"
         git commit -m "github_actions" -a;
