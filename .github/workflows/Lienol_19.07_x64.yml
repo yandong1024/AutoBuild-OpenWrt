@@ -68,6 +68,7 @@ jobs:
          git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo luci-app-ssr-plus-lean
          git clone https://github.com/siwind/luci-app-ttyd.git
          git clone https://github.com/ycg31/my
+         chmod 0775  luci-app-vssr.tar.xz
          tar   xvJf  luci-app-vssr.tar.xz
          rm    -rfv  my/openwrt-dnsforwarder
          rm    -rfv  my/openwrt-simple-obfs
