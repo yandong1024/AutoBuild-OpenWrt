@@ -64,10 +64,11 @@ jobs:
          git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
          git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
-         git clone https://github.com/weiwuji1/luci-app-vssr-plus
+         wget https://github.com/Ameykyl/openwrt18.06/blob/master/package/diy/luci-app-vssr.tar.xz
          git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo luci-app-ssr-plus-lean
-         git clone https://github.com/ozon/luci-app-ttyd
+         git clone https://github.com/siwind/luci-app-ttyd.git
          git clone https://github.com/ycg31/my
+         tar   xvJf  luci-app-vssr.tar.xz
          rm    -rfv  my/openwrt-dnsforwarder
          rm    -rfv  my/openwrt-simple-obfs
          rm    -rfv  my/openwrt-v2ray-plugin
