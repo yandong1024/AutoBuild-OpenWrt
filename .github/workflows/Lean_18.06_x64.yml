@@ -31,6 +31,7 @@ env:
   UPLOAD_FIRMWARE_ALL: true
   UPLOAD_FIRMWARE_UEFI: true
   UPLOAD_FIRMWARE_COMBINED: true
+  UPLOAD_COWTRANSFER: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -85,15 +86,12 @@ jobs:
       working-directory: ./openwrt/package/lean
       run: |
            git clone https://github.com/jerrykuku/lua-maxminddb.git 
-           git clone https://github.com/ycg31/luci-app-koolproxyR.git
-           git clone https://github.com/frainzy1477/luci-app-clash.git
-           git clone https://github.com/vernesong/OpenClash.git
            git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly
            git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly-dark
            git clone https://github.com/Leo-Jo-My/luci-theme-opentomato
            git clone https://github.com/Leo-Jo-My/luci-theme-opentomcat
-           git clone  https://github.com/Leo-Jo/luci-app-vssr
-           git clone  https://github.com/ycg31/my
+           git clone https://github.com/ycg31/luci-app-vssr
+           git clone https://github.com/ycg31/my
            
     - name: 删除冲突插件
       working-directory: ./openwrt/package/lean/my
@@ -146,7 +144,7 @@ jobs:
           find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i cp -f {} ./uefi/
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/  
     
-    - name : Upload uefi
+    - name : Upload combined
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_COMBINED == 'true'
       with:
@@ -173,3 +171,27 @@ jobs:
       with:
         name: OpenWrt_lean_IPK
         path: ./openwrt/bin/packages/
+    
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: 'lean_firmware.zip'
+        path: ./openwrt/bin/
+    
+    - name: Upload firmware to cowtransfer
+      if: env.UPLOAD_COWTRANSFER == 'true'
+      run: |
+        curl -sL https://git.io/cowtransfer | sh
+        ./cowtransfer-uploader -s -p 8 ./lean_firmware.zip
+    
+    - name: upload to gitee 传到码云
+      run: |
+        git config --global user.email "ycg31@qq.com"
+        git config --global user.name "ycg31"
+        git clone --depth 1 https://ycg31:${{ secrets.GITEE_TOKEN }}@gitee.com/ycg31/openwrt_firmware.git rom
+        mkdir -p rom/Lean_master/
+        cp -rf ./openwrt/bin/* rom/Lean_master/
+        cd rom
+        git add . || echo "1"
+        git commit -m "github_actions" -a;
+        git push || (sleep 30m && git push) || (sleep 30m && git push)
