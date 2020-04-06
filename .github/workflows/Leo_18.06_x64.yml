@@ -84,6 +84,7 @@ jobs:
       run: |  
          rm    -rfv  package/my/luci-app-openclash 
          rm    -rfv  package/my/luci-app-clash
+         rm    -rfv  package/my/luci-app-koolproxyR
          
     - name: Update & Install feeds
       working-directory: ./openwrt
