@@ -17,6 +17,7 @@ on:
   #    - master
       paths:
       - '.github/workflows/Lienol_19.07_x64.yml'
+      - './Lienol_19.07_x64.config'
   #schedule:
   #  - cron: 0 8 * * 5
   
