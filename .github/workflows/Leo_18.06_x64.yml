@@ -73,9 +73,9 @@ jobs:
     - name: Import external feeds
       working-directory: ./openwrt/package/diy
       run: |
-         git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo
          git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
-         git clone  https://github.com/Leo-Jo/luci-app-vssr
+         git clone  https://github.com/ycg31/luci-app-vssr
+         git clone  https://github.com/ycg31/luci-app-koolproxy
          git clone  https://github.com/Sweet-Fairy/openwrt-package
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
@@ -159,8 +159,26 @@ jobs:
         name: OpenWrt_leo_IPK
         path: ./openwrt/bin/packages/
       
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: 'Leo_firmware.zip'
+        path: ./openwrt/bin/
+    
     - name: Upload firmware to cowtransfer
       if: env.UPLOAD_COWTRANSFER == 'true'
       run: |
         curl -sL https://git.io/cowtransfer | sh
-        ./cowtransfer-uploader -s -p 8 ./openwrt/bin/targets/
+        ./cowtransfer-uploader -s -p 8 ./Leo_firmware.zip
+    
+    - name: upload to gitee 传到码云
+      run: |
+        git config --global user.email "ycg31@qq.com"
+        git config --global user.name "ycg31"
+        git clone --depth 1 https://ycg31:${{ secrets.GITEE_TOKEN }}@gitee.com/ycg31/openwrt_firmware.git rom
+        mkdir -p rom/Leo/
+        cp -rf ./openwrt/bin/* rom/Leo/
+        cd rom
+        git add . || echo "1"
+        git commit -m "github_actions" -a;
+        git push || (sleep 30m && git push) || (sleep 30m && git push)
