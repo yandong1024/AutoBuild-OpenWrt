@@ -15,6 +15,7 @@ on:
   #    - master
       paths:
       - '.github/workflows/Lean_18.06_x64.yml'
+      - './Lean_18.06_x64.config'
   #schedule:
   #  - cron: 0 8 * * 5
   
@@ -25,7 +26,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   CONFIG_FILE: Lean_18.06_x64.config
-  DIY_SH: 222.sh
+  DIY_SH: 22.sh
   SSH_ACTIONS: false
   UPLOAD_IPK: true
   UPLOAD_FIRMWARE_ALL: true
