@@ -35,6 +35,7 @@ env:
   UPLOAD_FIRMWARE_UEFI: true
   UPLOAD_FIRMWARE_COMBINED: true
   UPLOAD_COWTRANSFER: true
+  DATE: date +"%Y-%m-%d %H:%M:%S"
   TZ: Asia/Shanghai
   
 jobs:
@@ -169,7 +170,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: env.UPLOAD_IPK == 'true'
       with:
-        name: OpenWrt_Lienol_19.07_IPK
+        name: ${env.DATE} OpenWrt_Lienol_19.07_IPK
         path: ./openwrt/bin/packages/
         
     - name: Upload firmware to cowtransfer
