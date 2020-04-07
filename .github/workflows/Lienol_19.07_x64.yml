@@ -29,7 +29,7 @@ env:
   REPO_BRANCH: dev-19.07
   CONFIG_FILE: Lienol_19.07_x64.config
   DIY_SH: customize.sh
-  SSH_ACTIONS: false
+  SSH_ACTIONS: true
   UPLOAD_IPK: true
   UPLOAD_FIRMWARE_ALL: true
   UPLOAD_FIRMWARE_UEFI: true
@@ -95,7 +95,13 @@ jobs:
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x ./$DIY_SH && ./$DIY_SH
         cd openwrt && make defconfig
-        
+ 
+    - name: Setup Debug Session
+      env:
+       SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+      uses: tete1030/safe-debugger-action@master
+      if: env.SSH_ACTIONS == 'true'
+    
     - name: Make download
       run: |
           cd openwrt
