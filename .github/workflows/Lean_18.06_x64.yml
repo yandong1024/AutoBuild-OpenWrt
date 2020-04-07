@@ -15,7 +15,7 @@ on:
   #    - master
       paths:
       - '.github/workflows/Lean_18.06_x64.yml'
-      - './Lean_18.06_x64.config'
+      - 'Lean_18.06_x64.config'
   #schedule:
   #  - cron: 0 8 * * 5
   
@@ -48,7 +48,6 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        docker rmi `docker images -q`
         echo "Deleting files, please wait ...."
         sudo rm -rf \
           /usr/share/dotnet \
