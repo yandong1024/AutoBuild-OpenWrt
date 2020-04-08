@@ -172,18 +172,6 @@ jobs:
         name: OpenWrt_lean_IPK
         path: ./openwrt/bin/packages/
     
-    - name: Archive Release
-      uses: thedoctor0/zip-release@master
-      with:
-        filename: 'lean_firmware.zip'
-        path: ./openwrt/bin/
-    
-    - name: Upload firmware to cowtransfer
-      if: env.UPLOAD_COWTRANSFER == 'true'
-      run: |
-        curl -sL https://git.io/cowtransfer | sh
-        ./cowtransfer-uploader -s -p 8 ./lean_firmware.zip
-    
     - name: upload to gitee 传到码云
       run: |
         git config --global user.email "ycg31@qq.com"
@@ -195,3 +183,15 @@ jobs:
         git add . || echo "1"
         git commit -m "github_actions" -a;
         git push || (sleep 30m && git push) || (sleep 30m && git push)
+    
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: 'lean_firmware.zip'
+        path: ./openwrt/bin/
+    
+    - name: Upload firmware to cowtransfer
+      if: env.UPLOAD_COWTRANSFER == 'true'
+      run: |
+        curl -sL https://git.io/cowtransfer | sh
+        ./cowtransfer-uploader -s -p 8 ./lean_firmware.zip
