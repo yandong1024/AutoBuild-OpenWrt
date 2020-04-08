@@ -48,7 +48,6 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        echo "Deleting files, please wait ...."
         sudo rm -rf \
           /usr/share/dotnet \
           /etc/mysql \
