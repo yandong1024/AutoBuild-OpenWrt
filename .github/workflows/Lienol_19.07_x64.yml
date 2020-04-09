@@ -35,7 +35,6 @@ env:
   UPLOAD_FIRMWARE_UEFI: true
   UPLOAD_FIRMWARE_COMBINED: true
   UPLOAD_COWTRANSFER: true
-  DATE: date +"%Y-%m-%d %H:%M:%S"
   TZ: Asia/Shanghai
   
 jobs:
@@ -142,7 +141,9 @@ jobs:
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i cp -f {} ./uefi/
           find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i cp -f {} ./uefi/
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/
-
+    - name: Get Date
+      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')"
+    
     - name: Prepare artifact
       run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
     
