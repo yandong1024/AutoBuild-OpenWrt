@@ -172,6 +172,7 @@ jobs:
         path: ./openwrt/bin/packages/
     
     - name: upload to gitee 传到码云
+      continue-on-error : true
       run: |
         git config --global user.email "ycg31@qq.com"
         git config --global user.name "ycg31"
