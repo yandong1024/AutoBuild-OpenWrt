@@ -169,24 +169,28 @@ jobs:
     - name: Upload  IPK
       uses: actions/upload-artifact@master
       if: env.UPLOAD_IPK == 'true'
+      continue-on-error : true
       with:
         name: ${{env.DATE}} OpenWrt_Lienol_19.07_IPK
         path: ./openwrt/bin/packages/
         
     - name: Upload firmware to cowtransfer
       if: env.UPLOAD_COWTRANSFER == 'true'
+      continue-on-error : true
       run: |
         curl -sL https://git.io/cowtransfer | sh
         ./cowtransfer-uploader -s -p 8 ./firmware/
     
     - name: Archive Release
       uses: thedoctor0/zip-release@master
+      continue-on-error : true
       with:
         filename: 'firmware.zip'
         path: ./openwrt/bin/
 
     - name: Upload firmware to cowtransfer
       if: env.UPLOAD_COWTRANSFER == 'true'
+      continue-on-error : true
       run: |
         mkdir yu
         cp ./firmware.zip ./yu/firmware.zip
