@@ -133,7 +133,7 @@ jobs:
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/  
     
     - name: Get Date
-      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')" 
+      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %H%M')" 
 
     - name : Upload combined
       uses: actions/upload-artifact@master

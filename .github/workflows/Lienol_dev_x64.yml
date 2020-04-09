@@ -16,7 +16,7 @@ on:
   #    - master
       paths:
       - '.github/workflows/Lienol_dev_x64.yml'
-      - './Lienol_18.06_x64.config'
+      - './Lienol_dev_x64.config'
   #schedule:
   #  - cron: 0 8 * * 5
   
@@ -118,7 +118,7 @@ jobs:
       run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
 
     - name: Get Date
-      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')"
+      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %H%M')"
       
     - name: Upload artifact
       uses: actions/upload-artifact@master
