@@ -15,7 +15,7 @@ on:
   #  branches: 
   #    - master
       paths:
-      - '.github/workflows/Lienol_18.06_x64.yml'
+      - '.github/workflows/Lienol_dev_x64.yml'
       - './Lienol_18.06_x64.config'
   #schedule:
   #  - cron: 0 8 * * 5
@@ -26,7 +26,7 @@ on:
 env:
   REPO_URL: https://github.com/Lienol/openwrt
   REPO_BRANCH: dev-master
-  CONFIG_FILE: Lienol_18.06_x64.config
+  CONFIG_FILE: Lienol_dev_x64.config
   DIY_SH: customize.sh
   SSH_ACTIONS: false
   UPLOAD_IPK: true
