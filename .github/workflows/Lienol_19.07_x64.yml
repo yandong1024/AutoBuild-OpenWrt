@@ -59,7 +59,7 @@ jobs:
       run: |        
          git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
          cd openwrt/package/lean
-         git clone https://github.com/ycg31/luci-app-koolproxyR.git
+         git clone https://github.com/ycg31/luci-app-openwrt_firmwareR.git
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
          git clone https://github.com/Leo-Jo-My/luci-theme-Butterfly
@@ -204,7 +204,7 @@ jobs:
       run: |
         git config --global user.email "ycg31@qq.com"
         git config --global user.name "TzePUfjoaA"
-        git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/KoolProxy rom
+        git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/openwrt_firmware rom
         mkdir -p rom/Lean_master/
         cp -rf ./openwrt/bin/* rom/Lean_master/
         cd rom

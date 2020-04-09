@@ -75,7 +75,7 @@ jobs:
       run: |
          git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
          git clone https://github.com/ycg31/luci-app-vssr
-         git clone https://github.com/ycg31/luci-app-koolproxy
+         git clone https://github.com/ycg31/luci-app-openwrt_firmware
          git clone https://github.com/Sweet-Fairy/openwrt-package
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
@@ -84,7 +84,7 @@ jobs:
       run: |  
          rm   -rfv  package/my/luci-app-openclash 
          rm   -rfv  package/my/luci-app-clash
-         rm   -rfv  package/my/luci-app-koolproxyR
+         rm   -rfv  package/my/luci-app-openwrt_firmwareR
          
     - name: Update & Install feeds
       working-directory: ./openwrt
@@ -180,7 +180,7 @@ jobs:
       run: |
         git config --global user.email "ycg31@qq.com"
         git config --global user.name "TzePUfjoaA"
-        git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/KoolProxy rom
+        git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/openwrt_firmware rom
         mkdir -p rom/Lean_master/
         cp -rf ./openwrt/bin/* rom/Lean_master/
         cd rom
