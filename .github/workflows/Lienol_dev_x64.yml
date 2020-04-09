@@ -5,7 +5,7 @@
 # Author: P3TERX
 # Blog: https://p3terx.com
 #=================================================
-name: Lienol_18.06_x64
+name: Lienol_dev_x64
 
 on: 
   release:
