@@ -69,21 +69,22 @@ jobs:
          tar   xvJf  autocore.tar.xz
          tar   xvJf  luci-app-nps.tar.xz
          tar   xvJf  luci-app-adbyby-plus.tar.xz
+    
     - name: Import external feeds
       working-directory: ./openwrt/package/diy
       run: |
          git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
-         git clone  https://github.com/ycg31/luci-app-vssr
-         git clone  https://github.com/ycg31/luci-app-koolproxy
-         git clone  https://github.com/Sweet-Fairy/openwrt-package
+         git clone https://github.com/ycg31/luci-app-vssr
+         git clone https://github.com/ycg31/luci-app-koolproxy
+         git clone https://github.com/Sweet-Fairy/openwrt-package
          git clone https://github.com/frainzy1477/luci-app-clash.git
          git clone https://github.com/vernesong/OpenClash.git
     - name: 删除冲突文件
       working-directory: ./openwrt
       run: |  
-         rm    -rfv  package/my/luci-app-openclash 
-         rm    -rfv  package/my/luci-app-clash
-         rm    -rfv  package/my/luci-app-koolproxyR
+         rm   -rfv  package/my/luci-app-openclash 
+         rm   -rfv  package/my/luci-app-clash
+         rm   -rfv  package/my/luci-app-koolproxyR
          
     - name: Update & Install feeds
       working-directory: ./openwrt
@@ -131,54 +132,58 @@ jobs:
           find openwrt/bin/targets/ -name "*uefi*img*" | xargs -i cp -f {} ./uefi/
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/  
     
+    - name: Get Date
+      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')" 
+
     - name : Upload combined
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_COMBINED == 'true'
       with:
-        name: OpenWrt_leo_combined
+        name: ${{env.DATE}} OpenWrt_leo_combined
         path: ./combined/
 
     - name : Upload uefi
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_UEFI == 'true'
       with:
-        name: OpenWrt_leo_uefi
+        name: ${{env.DATE}} OpenWrt_leo_uefi
         path: ./uefi/
    
     - name: Upload firmware
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_ALL == 'true'
       with:
-        name: OpenWrt_leo_firmware
+        name: ${{env.DATE}} OpenWrt_leo_firmware
         path: ./openwrt/bin/targets/
           
     - name: Upload  IPK
       uses: actions/upload-artifact@master
       if: env.UPLOAD_IPK == 'true'
       with:
-        name: OpenWrt_leo_IPK
+        name: ${{env.DATE}} OpenWrt_leo_IPK
         path: ./openwrt/bin/packages/
       
     - name: Archive Release
       uses: thedoctor0/zip-release@master
       with:
-        filename: 'Leo_firmware.zip'
+        filename: '${{env.DATE}} Leo_firmware.zip'
         path: ./openwrt/bin/
     
     - name: Upload firmware to cowtransfer
       if: env.UPLOAD_COWTRANSFER == 'true'
       run: |
         curl -sL https://git.io/cowtransfer | sh
-        ./cowtransfer-uploader -s -p 8 ./Leo_firmware.zip
+        ./cowtransfer-uploader -s -p 8 ./${{env.DATE}} Leo_firmware.zip
     
-    - name: upload to gitee 传到码云
+    - name: upload to CODING 传到CODING
+      continue-on-error : true
       run: |
         git config --global user.email "ycg31@qq.com"
-        git config --global user.name "ycg31"
-        git clone --depth 1 https://ycg31:${{ secrets.GITEE_TOKEN }}@gitee.com/ycg31/openwrt_firmware.git rom
-        mkdir -p rom/Leo/
-        cp -rf ./openwrt/bin/* rom/Leo/
+        git config --global user.name "TzePUfjoaA"
+        git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/KoolProxy rom
+        mkdir -p rom/Lean_master/
+        cp -rf ./openwrt/bin/* rom/Lean_master/
         cd rom
         git add . || echo "1"
         git commit -m "github_actions" -a;
-        git push || (sleep 30m && git push) || (sleep 30m && git push)
+        git push

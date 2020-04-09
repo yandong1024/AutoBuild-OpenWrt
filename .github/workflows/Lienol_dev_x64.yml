@@ -116,54 +116,58 @@ jobs:
           
     - name: Prepare artifact
       run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
+
+    - name: Get Date
+      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %T')"
       
     - name: Upload artifact
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_UEFI == 'true'
       with:
-        name: OpenWrt Lienol_18.06_uefi
+        name: ${{env.DATE}} OpenWrt Lienol_dev_uefi
         path: ./uefi/
     - name: Upload artifact
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_COMBINED == 'true'
       with:
-        name: OpenWrt Lienol_18.06_combined
+        name: ${{env.DATE}} OpenWrt_Lienol_dev_combined
         path: ./combined/
       
     - name: Upload firmware
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FIRMWARE_ALL == 'true'
       with:
-        name: OpenWrt_Lienol_18.06_firmware
+        name: ${{env.DATE}} OpenWrt_Lienol_dev_firmware
         path: ./openwrt/bin/targets/
           
     - name: Upload  IPK
       uses: actions/upload-artifact@master
       if: env.UPLOAD_IPK == 'true'
       with:
-        name: OpenWrt_Lienol_18.06_IPK
+        name: ${{env.DATE}} OpenWrt_Lienol_dev_IPK
         path: ./openwrt/bin/packages/
     
     - name: Archive Release
       uses: thedoctor0/zip-release@master
       with:
-        filename: 'firmware.zip'
+        filename: '${{env.DATE}} OpenWrt_Lienol_dev_firmware.zip'
         path: ./openwrt/bin/
     
     - name: Upload firmware to cowtransfer
       if: env.UPLOAD_COWTRANSFER == 'true'
       run: |
         curl -sL https://git.io/cowtransfer | sh
-        ./cowtransfer-uploader -s -p 8 ./firmware.zip
+        ./cowtransfer-uploader -s -p 8 ./${{env.DATE}} OpenWrt_Lienol_dev_firmware.zip
     
-    - name: upload to gitee 传到码云
+    - name: upload to CODING 传到CODING
+      continue-on-error : true
       run: |
         git config --global user.email "ycg31@qq.com"
-        git config --global user.name "ycg31"
-        git clone --depth 1 https://ycg31:${{ secrets.GITEE_TOKEN }}@gitee.com/ycg31/openwrt_firmware.git rom
-        mkdir -p rom/Lienol_dev/
-        cp -rf ./openwrt/bin/* rom/Lienol_dev/
+        git config --global user.name "TzePUfjoaA"
+        git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/KoolProxy rom
+        mkdir -p rom/Lean_master/
+        cp -rf ./openwrt/bin/* rom/Lean_master/
         cd rom
         git add . || echo "1"
         git commit -m "github_actions" -a;
-        git push || (sleep 30m && git push) || (sleep 30m && git push)
+        git push
