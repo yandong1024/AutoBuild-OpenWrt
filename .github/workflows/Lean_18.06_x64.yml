@@ -164,19 +164,19 @@ jobs:
       with:
         name: OpenWrt_lean_IPK
         path: ./openwrt/bin/packages/
-    
-    - name: upload to gitee 传到码云
+
+    - name: upload to CODING 传到CODING
       continue-on-error : true
       run: |
         git config --global user.email "ycg31@qq.com"
-        git config --global user.name "ycg31"
-        git clone --depth 1 https://ycg31:${{ secrets.GITEE_TOKEN }}@gitee.com/ycg31/openwrt_firmware.git rom
+        git config --global user.name "TzePUfjoaA"
+        git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/KoolProxy rom
         mkdir -p rom/Lean_master/
         cp -rf ./openwrt/bin/* rom/Lean_master/
         cd rom
         git add . || echo "1"
         git commit -m "github_actions" -a;
-        git push || (sleep 30m && git push) || (sleep 30m && git push)
+        git push
     
     - name: Archive Release
       uses: thedoctor0/zip-release@master
