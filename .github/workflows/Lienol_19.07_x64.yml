@@ -170,7 +170,7 @@ jobs:
       uses: actions/upload-artifact@master
       if: env.UPLOAD_IPK == 'true'
       with:
-        name: ${env.DATE} OpenWrt_Lienol_19.07_IPK
+        name: ${{env.DATE}} OpenWrt_Lienol_19.07_IPK
         path: ./openwrt/bin/packages/
         
     - name: Upload firmware to cowtransfer
