@@ -81,6 +81,12 @@ jobs:
         chmod +x ./$DIY_SH && ./$DIY_SH
         cd openwrt && make defconfig
         
+    - name: Setup Debug Session
+      env:
+       SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+      uses: tete1030/safe-debugger-action@master
+      if: env.SSH_ACTIONS == 'true'
+
     - name: Make download
       run: |
           cd openwrt
@@ -117,7 +123,7 @@ jobs:
       run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
 
     - name: Get Date
-      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %H%M')"
+      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d-%H%M')"
       
     - name: Upload artifact
       uses: actions/upload-artifact@master
@@ -146,18 +152,6 @@ jobs:
         name: ${{env.DATE}} OpenWrt_Lienol_dev_IPK
         path: ./openwrt/bin/packages/
     
-    - name: Archive Release
-      uses: thedoctor0/zip-release@master
-      with:
-        filename: '${{env.DATE}} OpenWrt_Lienol_dev_firmware.zip'
-        path: ./openwrt/bin/
-    
-    - name: Upload firmware to cowtransfer
-      if: env.UPLOAD_COWTRANSFER == 'true'
-      run: |
-        curl -sL https://git.io/cowtransfer | sh
-        ./cowtransfer-uploader -s -p 8 ./${{env.DATE}} OpenWrt_Lienol_dev_firmware.zip
-    
     - name: upload to CODING 传到CODING
       continue-on-error : true
       run: |
@@ -170,3 +164,15 @@ jobs:
         git add . || echo "1"
         git commit -m "github_actions" -a;
         git push
+
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: '${{env.DATE}}OpenWrt_Lienol_dev_firmware.zip'
+        path: ./openwrt/bin/
+    
+    - name: Upload firmware to cowtransfer
+      if: env.UPLOAD_COWTRANSFER == 'true'
+      run: |
+        curl -sL https://git.io/cowtransfer | sh
+        ./cowtransfer-uploader -s -p 8 ./${{env.DATE}}OpenWrt_Lienol_dev_firmware.zip

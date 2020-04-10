@@ -143,7 +143,7 @@ jobs:
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/
     
     - name: Get Date
-      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %H%M')"
+      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d-%H%M')"
     
     - name: Prepare artifact
       run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
@@ -187,17 +187,15 @@ jobs:
       uses: thedoctor0/zip-release@master
       continue-on-error : true
       with:
-        filename: '${{env.DATE}} OpenWrt_Lienol_19.07_firmware.zip'
+        filename: '${{env.DATE}}OpenWrt_Lienol_19.07_firmware.zip'
         path: ./openwrt/bin/
 
     - name: Upload firmware to cowtransfer
       if: env.UPLOAD_COWTRANSFER == 'true'
       continue-on-error : true
       run: |
-        mkdir yu
-        cp ./firmware.zip ./yu/firmware.zip
         curl -sL https://git.io/cowtransfer | sh
-        ./cowtransfer-uploader -s -p 8 ./yu/
+        ./cowtransfer-uploader -s -p 8 ./${{env.DATE}}OpenWrt_Lienol_19.07_firmware.zip
     
     - name: upload to CODING 传到CODING
       continue-on-error : true

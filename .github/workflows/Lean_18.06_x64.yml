@@ -98,9 +98,11 @@ jobs:
         chmod +x ./$DIY_SH && ./$DIY_SH
         cd openwrt && make defconfig
 
-    - name: SSH connection to Actions
-      uses: P3TERX/debugger-action@master
-      if: env.SSH_ACTIONS == 'true' 
+    - name: Setup Debug Session
+      env:
+       SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+      uses: tete1030/safe-debugger-action@master
+      if: env.SSH_ACTIONS == 'true'
 
     - name: Download package
       working-directory: ./openwrt
@@ -138,7 +140,7 @@ jobs:
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/  
     
     - name: Get Date
-      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d %H%M')"
+      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d-%H%M')"
     
     - name : Upload combined
       uses: actions/upload-artifact@master
@@ -184,11 +186,11 @@ jobs:
     - name: Archive Release
       uses: thedoctor0/zip-release@master
       with:
-        filename: '${{env.DATE}} lean_firmware.zip'
+        filename: '${{env.DATE}}lean_firmware.zip'
         path: ./openwrt/bin/
     
     - name: Upload firmware to cowtransfer
       if: env.UPLOAD_COWTRANSFER == 'true'
       run: |
         curl -sL https://git.io/cowtransfer | sh
-        ./cowtransfer-uploader -s -p 8 ./${{env.DATE}} lean_firmware.zip
+        ./cowtransfer-uploader -s -p 8 ./${{env.DATE}}lean_firmware.zip
