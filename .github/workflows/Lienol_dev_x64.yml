@@ -158,8 +158,8 @@ jobs:
         git config --global user.email "ycg31@qq.com"
         git config --global user.name "TzePUfjoaA"
         git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/OpenWrt/openwrt_firmware rom
-        mkdir -p rom/Lean_master/
-        cp -rf ./openwrt/bin/* rom/Lean_master/
+        mkdir -p rom/Lienol_dev/
+        cp -rf ./openwrt/bin/* rom/Lienol_dev/
         cd rom
         git add . || echo "1"
         git commit -m "github_actions" -a;
