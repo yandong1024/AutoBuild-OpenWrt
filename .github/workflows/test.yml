@@ -1,0 +1,40 @@
+name: test
+
+on: 
+  release:
+    types: [published]
+
+  push:
+  #  branches: 
+  #    - master
+      paths:
+      - '.github/workflows/test.yml'
+      - 'Lienol_19.07_x64.config'
+  #schedule:
+  #  - cron: 0 8 * * 5
+  
+  watch:
+    types: [started]
+
+env:
+  REPO_URL: https://github.com/Lienol/openwrt
+  REPO_BRANCH: 19.07
+  CONFIG_FILE: Lienol_19.07_x64.config
+  DIY_SH: customize.sh
+  SSH_ACTIONS: true
+  UPLOAD_IPK: true
+  UPLOAD_FIRMWARE_ALL: true
+  UPLOAD_FIRMWARE_UEFI: true
+  UPLOAD_FIRMWARE_COMBINED: true
+  UPLOAD_COWTRANSFER: true
+  TZ: Asia/Shanghai
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Get Date
+      run: echo "DATE=$(TZ=':Asia/Shanghai' date '+%Y-%m-%d-%H%M')" >> ${env:GITHUB_ENV}
