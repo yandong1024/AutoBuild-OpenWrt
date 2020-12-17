@@ -143,7 +143,7 @@ jobs:
           find openwrt/bin/targets/ -name "*config*" | xargs -i cp -f {} ./uefi/
     
     - name: Get Date
-      run: echo "::set-env name=DATE::$(TZ=':Asia/Shanghai' date '+%Y-%m-%d-%H%M')"
+      run: echo "DATE=$(TZ=':Asia/Shanghai' date '+%Y%m%d-%H%M')" >> $GITHUB_ENV
     
     - name: Prepare artifact
       run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
