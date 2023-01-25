@@ -24,7 +24,7 @@ on:
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt
-  REPO_BRANCH: openwrt-21.02
+  REPO_TAG: v21.02.3
   CONFIG_FILE: openwrt2102.config
   DIY_SH: 22.sh
   SSH_ACTIONS: false
@@ -66,20 +66,29 @@ jobs:
         # ln -s /mnt/openwrt/staging_dir ./staging_dir
         df -h
     - name: Clone source code
-      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+      run: |
+        git clone $REPO_URL openwrt
+        cd openwrt
+        git checkoout  $REPO_TAG
 
     - name: Update & Install feeds
       working-directory: ./openwrt
       run: |
-        sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-        sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
+#        sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
+#        sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
+       sed -i '$a src-git PWpackages https://github.com/xiaorouji/openwrt-passwall.git;packages' feeds.conf.default
+       sed -i '$a src-git PWluci https://github.com/xiaorouji/openwrt-passwall.git;luci' feeds.conf.default
+       sed -i 's/dnsmasq/dnsmasq-full/g' include/target.mk
         ./scripts/feeds update -a
         ./scripts/feeds install -a
     - name: Import external feeds
       working-directory: ./openwrt/package/
       run: |
         git clone -b 21.02 https://github.com/kenzok78/luci-theme-argonne
-        git clone https://github.com/thinktip/luci-theme-neobird
+        git clone https://github.com/mchome/openwrt-vlmcsd.git
+        git clone https://github.com/mchome/luci-app-vlmcsd.git
+        
+ #       git clone https://github.com/thinktip/luci-theme-neobird
            
  #   - name: 删除冲突插件
  #     working-directory: ./openwrt/package/
