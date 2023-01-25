@@ -69,7 +69,7 @@ jobs:
       run: |
         git clone $REPO_URL openwrt
         cd openwrt
-        git checkoout  $REPO_TAG
+        git checkout  $REPO_TAG
 
     - name: Update & Install feeds
       working-directory: ./openwrt
