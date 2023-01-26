@@ -83,8 +83,7 @@ jobs:
       run: |
         git clone -b 21.02 https://github.com/kenzok78/luci-theme-argonne
         git clone https://github.com/mchome/openwrt-vlmcsd.git
-        git clone https://github.com/mchome/luci-app-vlmcsd.git
-        
+        git clone https://github.com/mchome/luci-app-vlmcsd.git      
  #       git clone https://github.com/thinktip/luci-theme-neobird
            
  #   - name: 删除冲突插件
