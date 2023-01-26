@@ -1,0 +1,284 @@
+#=================================================
+# Description: Build OpenWrt using GitHub Actions
+# Lisence: MIT
+# Author: ycg31
+#=================================================
+
+name: OpenWrt-CI
+
+on: 
+  release:
+    types: [published]
+
+  push:
+  #  branches: 
+  #    - master
+      paths:
+      - '.github/workflows/openwrt-21.02.5.yml'
+      - 'openwrt2102.config'
+  #schedule:
+  #  - cron: 0 8 * * 5
+  
+  watch:
+    types: [started]
+
+env:
+  REPO_URL: https://github.com/openwrt/openwrt
+  REPO_TAG: v21.02.5
+  CONFIG_FILE: openwrt2102.config
+  DIY_SH: 22.sh
+  SSH_ACTIONS: false
+  UPLOAD_IPK: true
+  UPLOAD_FIRMWARE_ALL: true
+  UPLOAD_FIRMWARE_UEFI: true
+  UPLOAD_FIRMWARE_COMBINED: true
+  UPLOAD_COWTRANSFER: true
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Space cleanup
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        docker rmi `docker images -q`
+        sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+        sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* adoptopenjdk* mysql* php* mongodb* dotnet* moby* snapd* || true
+        sudo -E apt-get update
+        sudo -E apt-get -y install apt-transport-https ca-certificates build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc-s1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf swig libtinfo5
+        sudo -E apt-get -y autoremove --purge
+        sudo -E apt-get clean
+        sudo update-ca-certificates
+        # sudo mkdir -p -m 777 /mnt/openwrt/bin /mnt/openwrt/build_dir/host /mnt/openwrt/build_dir/hostpkg /mnt/openwrt/dl /mnt/openwrt/feeds /mnt/openwrt/staging_dir
+        # ln -s /mnt/openwrt/bin ./bin
+        # mkdir -p ./build_dir
+        # ln -s -f /mnt/openwrt/build_dir/host ./build_dir/host
+        # ln -s -f /mnt/openwrt/build_dir/hostpkg ./build_dir/hostpkg
+        # ln -s /mnt/openwrt/dl ./dl
+        # ln -s /mnt/openwrt/feeds ./feeds
+        # ln -s /mnt/openwrt/staging_dir ./staging_dir
+        df -h
+    - name: Clone source code
+      run: |
+        git clone $REPO_URL openwrt
+        cd openwrt
+        git checkout  $REPO_TAG
+
+    - name: Update & Install feeds
+      working-directory: ./openwrt
+      run: |
+       sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
+       sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+    - name: Import external feeds
+      working-directory: ./openwrt/package/
+      run: |
+        git clone -b 21.02 https://github.com/kenzok78/luci-theme-argonne
+        git clone https://github.com/mchome/openwrt-vlmcsd.git
+        git clone https://github.com/mchome/luci-app-vlmcsd.git
+        
+ #       git clone https://github.com/thinktip/luci-theme-neobird
+           
+ #   - name: 删除冲突插件
+ #     working-directory: ./openwrt/package/
+ #     run: |
+ #       rm -rvf openwrt-simple-obfs
+ #       rm -rvf openwrt-v2ray-plugin
+        
+    - name: Configuration Customization 
+      run: |
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x ./$DIY_SH && ./$DIY_SH
+        cd openwrt && make defconfig
+    - name: Setup Debug Session
+      env:
+       SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+      uses: tete1030/safe-debugger-action@master
+      if: env.SSH_ACTIONS == 'true'
+
+    - name: Download package
+      working-directory: ./openwrt
+      run: |
+        make download -j$(nproc)
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+    - name: Multi-thread compile
+      run: |
+          cd openwrt
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+          
+    - name: Single-thread compile
+      if: failure()
+      run: |
+          cd openwrt
+          make -j1 V=s          
+
+    - name: Assemble package
+      run: |
+          rm -rf ./package/
+          mkdir -p ./package/
+          cp -rf $(find ./bin/targets/ -type d -name "packages") ./bin/packages/tarpackages
+
+    - name: Assemble ext4-combined
+      run: |
+          rm -rf ./ext4-combined/
+          mkdir -p ./ext4-combined/
+
+          find openwrt/bin/targets/ -name "*buildinfo*" | xargs -i cp -f {} ./ext4-combined/
+          find openwrt/bin/targets/ -name "*.bin" | xargs -i cp -f {} ./ext4-combined/
+          find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./ext4-combined/
+          find openwrt/bin/targets/ -name "*ext4-combined.img" | xargs -i cp -f {} ./ext4-combined/
+          
+     - name: Assemble ext4-combined-efi
+      run: |
+          rm -rf ./ext4-combined-efi/
+          mkdir -p ./ext4-combined-efi/
+
+          find openwrt/bin/targets/ -name "*buildinfo*" | xargs -i cp -f {} ./ext4-combined-efi/
+          find openwrt/bin/targets/ -name "*.bin" | xargs -i cp -f {} ./ext4-combined-efi/
+          find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./ext4-combined-efi/
+          find openwrt/bin/targets/ -name "*ext4-combined-efi*" | xargs -i cp -f {} ./ext4-combined-efi/
+
+     - name: Assemble ext4-rootfs
+      run: |
+          rm -rf ./ext4-rootfs/
+          mkdir -p ./ext4-rootfs/
+
+          find openwrt/bin/targets/ -name "*buildinfo*" | xargs -i cp -f {} ./ext4-rootfs/
+          find openwrt/bin/targets/ -name "*.bin" | xargs -i cp -f {} ./ext4-rootfs/
+          find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./ext4-rootfs/
+          find openwrt/bin/targets/ -name "*ext4-rootfs*" | xargs -i cp -f {} ./ext4-rootfs/
+
+     - name: Assemble rootfs.tar.gz
+      run: |
+          rm -rf ./rootfs.tar.gz/
+          mkdir -p ./rootfs.tar.gz/
+
+          find openwrt/bin/targets/ -name "*buildinfo*" | xargs -i cp -f {} ./rootfs.tar.gz/
+          find openwrt/bin/targets/ -name "*.bin" | xargs -i cp -f {} ./rootfs.tar.gz/
+          find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./rootfs.tar.gz/
+          find openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i cp -f {} ./rootfs.tar.gz/
+
+     - name: Assemble squashfs-combined.img
+      run: |
+          rm -rf ./squashfs-combined.img/
+          mkdir -p ./squashfs-combined.img/
+
+          find openwrt/bin/targets/ -name "*buildinfo*" | xargs -i cp -f {} ./squashfs-combined.img/
+          find openwrt/bin/targets/ -name "*.bin" | xargs -i cp -f {} ./squashfs-combined.img/
+          find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./squashfs-combined.img/
+          find openwrt/bin/targets/ -name "*squashfs-combined.img" | xargs -i cp -f {} ./squashfs-combined.img/
+
+     - name: Assemble squashfs-combined-efi
+      run: |
+          rm -rf ./squashfs-combined-efi/
+          mkdir -p ./squashfs-combined-efi/
+
+          find openwrt/bin/targets/ -name "*buildinfo*" | xargs -i cp -f {} ./squashfs-combined-efi/
+          find openwrt/bin/targets/ -name "*.bin" | xargs -i cp -f {} ./squashfs-combined-efi/
+          find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./squashfs-combined-efi/
+          find openwrt/bin/targets/ -name "*squashfs-combined-efi*" | xargs -i cp -f {} ./squashfs-combined-efi/
+
+     - name: Assemble squashfs-rootfs
+      run: |
+          rm -rf ./squashfs-rootfs/
+          mkdir -p ./squashfs-rootfs/
+
+          find openwrt/bin/targets/ -name "*buildinfo*" | xargs -i cp -f {} ./squashfs-rootfs/
+          find openwrt/bin/targets/ -name "*.bin" | xargs -i cp -f {} ./squashfs-rootfs/
+          find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./squashfs-rootfs/
+          find openwrt/bin/targets/ -name "*squashfs-rootfs*" | xargs -i cp -f {} ./squashfs-rootfs/          
+
+    
+    - name: Get Date
+      run: echo "DATE=$(TZ=':Asia/Shanghai' date '+%Y%m%d-%H%M')" >> $GITHUB_ENV
+    
+    - name : Upload IPK
+      uses: actions/upload-artifact@master
+      with:
+        name: ${{env.DATE}} OpenWrt_IPK
+        path: ./bin/packages
+
+    - name : Upload ext4-combined
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_COMBINED == 'true'
+      with:
+        name: ${{env.DATE}} OpenWrt_ext4_combined
+        path: ./ext4-combined/
+
+
+    - name : Upload ext4-combined-efi
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_UEFI == 'true'
+      with:
+        name: ${{env.DATE}} OpenWrt_ext4_combined_efi
+        path: ./ext4-combined-efi/
+   
+    - name: Upload OpenWrt_ext4_rootfs
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE_ALL == 'true'
+      with:
+        name: ${{env.DATE}} OpenWrt_ext4_rootfs
+        path: ./ext4-rootfs/
+          
+    - name: Upload  rootfs.tar.gz
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_IPK == 'true'
+      with:
+        name: ${{env.DATE}} OpenWrt_rootfs.tar.gz
+        path: ./rootfs.tar.gz/
+
+    - name: Upload  squashfs-combined.img
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_IPK == 'true'
+      with:
+        name: ${{env.DATE}} OpenWrt_squashfs_combined
+        path: ./squashfs-combined.img/
+
+    - name: Upload  squashfs_combined_efi
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_IPK == 'true'
+      with:
+        name: ${{env.DATE}} OpenWrt_squashfs_combined_efi
+        path: ./squashfs-combined-efi/
+
+    - name: Upload  squashfs_rootfs
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_IPK == 'true'
+      with:
+        name: ${{env.DATE}} OpenWrt_squashfs_rootfs
+        path: ./squashfs-rootfs/
+
+    - name: upload to CODING 传到CODING
+      continue-on-error : true
+      run: |
+        git config --global user.email "ycg31@qq.com"
+        git config --global user.name "TzePUfjoaA"
+        git clone --depth 1 https://TzePUfjoaA:${{ secrets.CODING_TOKEN }}@e.coding.net/ycg31/OpenWrt/openwrt_FW rom
+        mkdir -p rom/openwrt_21.02.5/
+        cp -rf ./openwrt/bin/* rom/openwrt_21.02.5/
+        cd rom
+        git add . || echo "1"
+        git commit -m "github_actions" -a;
+        git push
+    
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: '${{env.DATE}}openwrt_firmware.zip'
+        path: ./openwrt/bin/
+    
+    - name: Upload firmware to cowtransfer
+      if: env.UPLOAD_COWTRANSFER == 'true'
+      run: |
+        curl -sL https://git.io/cowtransfer | sh
+        ./cowtransfer-uploader -s -p 8 ./${{env.DATE}}openwrt_firmware.zip
