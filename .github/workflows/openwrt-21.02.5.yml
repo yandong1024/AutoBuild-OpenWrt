@@ -137,7 +137,7 @@ jobs:
           find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./ext4-combined/
           find openwrt/bin/targets/ -name "*ext4-combined.img" | xargs -i cp -f {} ./ext4-combined/
           
-     - name: Assemble ext4-combined-efi
+    - name: Assemble ext4-combined-efi
       run: |
           rm -rf ./ext4-combined-efi/
           mkdir -p ./ext4-combined-efi/
@@ -147,7 +147,7 @@ jobs:
           find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./ext4-combined-efi/
           find openwrt/bin/targets/ -name "*ext4-combined-efi*" | xargs -i cp -f {} ./ext4-combined-efi/
 
-     - name: Assemble ext4-rootfs
+    - name: Assemble ext4-rootfs
       run: |
           rm -rf ./ext4-rootfs/
           mkdir -p ./ext4-rootfs/
@@ -157,7 +157,7 @@ jobs:
           find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./ext4-rootfs/
           find openwrt/bin/targets/ -name "*ext4-rootfs*" | xargs -i cp -f {} ./ext4-rootfs/
 
-     - name: Assemble rootfs.tar.gz
+    - name: Assemble rootfs.tar.gz
       run: |
           rm -rf ./rootfs.tar.gz/
           mkdir -p ./rootfs.tar.gz/
@@ -167,7 +167,7 @@ jobs:
           find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./rootfs.tar.gz/
           find openwrt/bin/targets/ -name "*rootfs.tar.gz" | xargs -i cp -f {} ./rootfs.tar.gz/
 
-     - name: Assemble squashfs-combined.img
+    - name: Assemble squashfs-combined.img
       run: |
           rm -rf ./squashfs-combined.img/
           mkdir -p ./squashfs-combined.img/
@@ -177,7 +177,7 @@ jobs:
           find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./squashfs-combined.img/
           find openwrt/bin/targets/ -name "*squashfs-combined.img" | xargs -i cp -f {} ./squashfs-combined.img/
 
-     - name: Assemble squashfs-combined-efi
+    - name: Assemble squashfs-combined-efi
       run: |
           rm -rf ./squashfs-combined-efi/
           mkdir -p ./squashfs-combined-efi/
@@ -187,7 +187,7 @@ jobs:
           find openwrt/bin/targets/ -name "*sha256sums" | xargs -i cp -f {} ./squashfs-combined-efi/
           find openwrt/bin/targets/ -name "*squashfs-combined-efi*" | xargs -i cp -f {} ./squashfs-combined-efi/
 
-     - name: Assemble squashfs-rootfs
+    - name: Assemble squashfs-rootfs
       run: |
           rm -rf ./squashfs-rootfs/
           mkdir -p ./squashfs-rootfs/
