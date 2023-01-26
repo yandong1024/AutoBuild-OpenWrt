@@ -91,11 +91,12 @@ jobs:
  #     run: |
  #       rm -rvf openwrt-simple-obfs
  #       rm -rvf openwrt-v2ray-plugin
-        
+                
     - name: Configuration Customization 
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x ./$DIY_SH && ./$DIY_SH
+        chmod +x ./$DIY_SH
+        /bin/bash ./$DIY_SH
         cd openwrt && make defconfig
     - name: Setup Debug Session
       env:
