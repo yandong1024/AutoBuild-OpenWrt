@@ -110,14 +110,8 @@ jobs:
         make download -j$(nproc)
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-    - name: Multi-thread compile
-      run: |
-          cd openwrt
-          echo -e "$(nproc) thread build."
-          make -j$(nproc) V=s
           
     - name: Single-thread compile
-      if: failure()
       run: |
           cd openwrt
           make -j1 V=s          
